@@ -9,7 +9,7 @@ app.set('port', (process.env.PORT || 5000));
 
 app.use(express.static(__dirname + '/public'));
 
-var message_queue = ["random"];
+var message_queue = ["random","23423"];
 
 // views is directory for all template files
 app.set('views', __dirname + '/views');
@@ -17,9 +17,9 @@ app.set('view engine', 'ejs');
 
 app.get('/retrieveData', function (req, res) {
 	if (message_queue)
-		res.end(message_queue.pop());
+		res.send(message_queue.pop());
 	else
-		res.end("No message in queue.");
+		res.send("No message in queue.");
 });
 
 app.post('/sendData', function (req, res) {
