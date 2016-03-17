@@ -1,6 +1,6 @@
 {
-  "name": "StegoCrypto Server",
-  "version": "1.0",
+  "name": "StegoCryptoServer",
+  "version": "1.0.0",
   "description": "Restful API server for StegoCrypto App",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "ejs": "2.3.3",
-    "express": "4.13.3"
+    "express": "4.13.3",
+    "body-parser": "1.15.0"
   },
   "engines": {
     "node": "0.12.7"
