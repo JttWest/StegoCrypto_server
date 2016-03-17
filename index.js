@@ -24,6 +24,7 @@ app.get('/retrieveData', function (req, res) {
 
 app.post('/sendData', function (req, res) {
    var user_name = message_queue.push(req.body);
+   res.end("OK!");
 });
 
 app.get('/', function(request, response) {
