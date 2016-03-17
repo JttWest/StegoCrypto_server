@@ -20,12 +20,11 @@ app.get('/retrieveData', function (req, res) {
 		res.end(message_queue.pop());
 	else
 		res.end("No message in queue.");
-
-}))
+});
 
 app.post('/sendData', function (req, res) {
    var user_name = message_queue.push(req.body);
-}))
+});
 
 app.get('/', function(request, response) {
   response.render('pages/index');
