@@ -22,6 +22,17 @@ app.get('/retrieveData', function (req, res) {
 		res.send("No message in queue.");
 });
 
+app.get('/getDataInQueue', function (req, res) {
+	var result = "";
+
+	for (var data in message_queue){
+		result += data;
+		result += ' ';
+	}
+
+	res.send(result);
+});
+
 app.post('/sendData', function (req, res) {
    var user_name = message_queue.push(req.body);
    res.end("OK!");
