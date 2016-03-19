@@ -9,7 +9,7 @@ app.set('port', (process.env.PORT || 5000));
 
 app.use(express.static(__dirname + '/public'));
 
-var message_queue = ["random","23423"];
+var message_queue = [];
 
 // views is directory for all template files
 app.set('views', __dirname + '/views');
@@ -34,16 +34,17 @@ app.get('/getDataInQueue', function (req, res) {
 });
 
 app.post('/sendData', function (req, res) {
-   var user_name = message_queue.push(req.body.data);
-   res.send("Server received: " + req.body.data);
+	var data = decodeURI(req.body.data);
+    var user_name = message_queue.push(data);
+    res.send("Server received: " + data);
 });
 
 app.get('/', function(request, response) {
-  response.render('pages/index');
+	response.render('pages/index');
 });
 
 app.listen(app.get('port'), function() {
-  console.log('Node app is running on port', app.get('port'));
+	console.log('Node app is running on port', app.get('port'));
 });
 
 
