@@ -26,8 +26,8 @@ app.get('/getDataInQueue', function (req, res) {
 	var result = "";
 
 	for (var data in message_queue){
-		result += data + " : " + message_queue[data];
-		result += '\n';
+		result += data + ": " + message_queue[data];
+		result += '</br>';
 	}
 
 	res.send(result);
