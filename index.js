@@ -19,23 +19,23 @@ app.get('/retrieveData', function (req, res) {
 	if (message_queue)
 		res.send(message_queue.pop());
 	else
-		res.send("No message in queue.");
+		res.send('No item in queue.');
 });
 
 app.get('/getDataInQueue', function (req, res) {
 	var result = "";
 
 	for (var data in message_queue){
-		result += data;
-		result += ' ';
+		result += data + " : " + message_queue[data];
+		result += '\n';
 	}
 
 	res.send(result);
 });
 
 app.post('/sendData', function (req, res) {
-   var user_name = message_queue.push(req.body);
-   res.end("OK!");
+   var user_name = message_queue.push(req.body.data);
+   res.send("Server received: " + req.body.data);
 });
 
 app.get('/', function(request, response) {
