@@ -34,7 +34,7 @@ app.get('/getDataInQueue', function (req, res) {
 });
 
 app.post('/sendData', function (req, res) {
-	var data = decodeURI(req.body.data);
+	var data = decodeURIComponent(req.body.data);
     var user_name = message_queue.push(data);
     res.send("Server received: " + data);
 });
