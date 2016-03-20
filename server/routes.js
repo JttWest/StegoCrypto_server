@@ -1,7 +1,11 @@
-
+var user_calls = require('./user_calls');
 
 module.exports = function(app) {
 	var message_queue = []
+
+	app.get('/', function(request, response) {
+		response.render('pages/index');
+	});
 
 	app.get('/retrieveData', function (req, res) {
 	if (message_queue)
@@ -27,8 +31,26 @@ module.exports = function(app) {
 	    res.send("Server received: " + data);
 	});
 
-	app.get('/', function(request, response) {
-		response.render('pages/index');
+	// user calls
+	app.post('/register',function(req,res){
+		var userName = req.body.userName;
+   		var password = req.body.password;
+    	var registrationID	 = req.body.registrationID;
+
+		user_calls.register(userName, password, registrationID, function (found) {
+			console.log(found);
+			res.json(found);
+		});		
 	});
 
+	app.post('/sendMessage',function(req,res){
+		var fromUserName = req.body.fromUserName;
+        var toUserName = req.body.toUserName;
+        var msg = req.body.message;
+		
+		requests.sendMessage(fromUserName, toUserName, msg, function (found) {
+			console.log(found);
+			res.json(found);
+		});		
+	});
 }

@@ -9,7 +9,10 @@
   "dependencies": {
     "ejs": "2.3.3",
     "express": "4.13.3",
-    "body-parser": "1.15.0"
+    "body-parser": "1.15.0",
+	  "mongoose": "4.4.8",	
+	  "connect": "~2.14.4",
+	  "node-gcm": "0.14.0"
   },
   "engines": {
     "node": "0.12.7"
@@ -21,7 +24,8 @@
   "keywords": [
     "node",
     "heroku",
-    "express"
+    "express",
+    "StegoCrypto"
   ],
   "license": "MIT"
 }
