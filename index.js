@@ -9,12 +9,13 @@ app.set('port', (process.env.PORT || 5000));
 
 app.use(express.static(__dirname + '/public'));
 
-var message_queue = [];
+//var message_queue = [];
 
 // views is directory for all template files
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
+/*
 app.get('/retrieveData', function (req, res) {
 	if (message_queue)
 		res.send(message_queue.pop());
@@ -41,7 +42,9 @@ app.post('/sendData', function (req, res) {
 
 app.get('/', function(request, response) {
 	response.render('pages/index');
-});
+}); */
+
+require('./server/routes.js')(app); // load routes
 
 app.listen(app.get('port'), function() {
 	console.log('Node app is running on port', app.get('port'));
