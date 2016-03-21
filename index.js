@@ -4,9 +4,7 @@ var mongoose = require('mongoose');
 
 var app = express();
 
-var configs = require('./config/configs');
-
-mongoose.connect(configs.mongoDB_url);
+mongoose.connect(process.env.MONGODB_URL || require('./config/configs').mongoDB_url);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
