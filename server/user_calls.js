@@ -1,9 +1,8 @@
 var mongoose = require('mongoose');
 var gcm = require('node-gcm');
 var user = require('./models/user');
-var configs = require('../config/configs')
 
-var GCMsender = new gcm.Sender(configs.GCM_server_API_key);
+var GCMsender = new gcm.Sender( process.env.GCM_SERVER_API_KEY || require('../config/configs').GCM_server_API_key );
 
 exports.register = function(userName, password, registrationTokens, callback) {
   var newuser = new user({ 
