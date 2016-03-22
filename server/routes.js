@@ -35,13 +35,25 @@ module.exports = function(app) {
 	app.post('/register',function(req,res){
 		var userName = req.body.userName;
    		var password = req.body.password;
-    	var registrationID	 = req.body.registrationID;
+    	var instanceIDTokens = req.body.instanceIDTokens;
 
-		user_calls.register(userName, password, registrationID, function (found) {
+		user_calls.register(userName, password, instanceIDTokens, function (found) {
 			console.log(found);
 			res.json(found);
 		});		
 	});
+
+	app.post('/login',function(req,res){
+		var userName = req.body.userName;
+   		var password = req.body.password;
+    	var instanceIDTokens = req.body.instanceIDTokens;
+
+		user_calls.login(userName, password, instanceIDTokens, function (found) {
+			console.log(found);
+			res.json(found);
+		});		
+	});
+
 
 	app.post('/sendMessage',function(req,res){
 		var fromUserName = req.body.fromUserName;

@@ -4,11 +4,11 @@ var user = require('./models/user');
 
 var GCMsender = new gcm.Sender( process.env.GCM_SERVER_API_KEY || require('../config/configs').GCM_server_API_key );
 
-exports.register = function(userName, password, registrationTokens, callback) {
+exports.register = function(userName, password, instanceIDTokens, callback) {
   var newuser = new user({ 
     userName               : userName,
     password               : password, 
-    registrationTokens     : registrationTokens
+    instanceIDTokens     : instanceIDTokens
     //userID     : userID  should auto generate this...
   });
 
@@ -21,6 +21,26 @@ exports.register = function(userName, password, registrationTokens, callback) {
       });
     } else {
      callback({'response':"User already registered."});
+   }});
+}
+
+exports.login = function(userName, password, instanceIDTokens, callback) {
+
+  user.findOne({userName: userName}, function(err,user){
+    if (!user) {
+      callback({'response':"User does not exist."});
+    } else {
+      if(password == user.password) {
+        // update DB with new instanceIDToken
+        user.instanceIDTokens = instanceIDTokens;
+        user.save(function (err){
+            if (err)
+              callback(err);
+        });
+        callback({'response':"Sucessfully login."});
+      } else {
+        callback({'response':"Wrong password."});
+      }
    }});
 }
 
@@ -56,7 +76,7 @@ exports.sendMessage = function(fromUserName, toUserName, msg, callback) {
     if(len == 0){
       callback({'response':"Failure"});
     } else {
-      var to_token = users[0].registrationTokens;
+      var to_token = users[0].instanceIDTokens;
       //var to_userName = users[0].userName;
 
       var message = new gcm.Message();
@@ -65,7 +85,7 @@ exports.sendMessage = function(fromUserName, toUserName, msg, callback) {
 
       var regTokens = [to_token];
 
-      GCMsender.send(message, { registrationTokens: registrationTokens }, 3, function (err, response){
+      GCMsender.send(message, { instanceIDTokens: instanceIDTokens }, 3, function (err, response){
         if (err) 
           console.error(err);
         else    
