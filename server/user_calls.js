@@ -8,7 +8,7 @@ exports.register = function(userName, password, instanceIDTokens, callback) {
   var newuser = new user({ 
     userName               : userName,
     password               : password, 
-    instanceIDTokens     : instanceIDTokens
+    //instanceIDTokens       : [instanceIDTokens] -- instanceID only updated by login
     //userID     : userID  should auto generate this...
   });
 
@@ -32,7 +32,7 @@ exports.login = function(userName, password, instanceIDTokens, callback) {
     } else {
       if(password == user.password) {
         // update DB with new instanceIDToken
-        user.instanceIDTokens = instanceIDTokens;
+        user.instanceIDTokens.push(instanceIDTokens);
         user.save(function (err){
             if (err)
               callback(err);
