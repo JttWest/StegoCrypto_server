@@ -54,15 +54,14 @@ module.exports = function(app) {
 		});		
 	});
 
-
 	app.post('/sendMessage',function(req,res){
 		var fromUserName = req.body.fromUserName;
         var toUserName = req.body.toUserName;
         var msg = req.body.message;
-		
-		requests.sendMessage(fromUserName, toUserName, msg, function (found) {
+
+		user_calls.sendMessage(fromUserName, toUserName, msg, function (found) {
 			console.log(found);
-			res.json(found);
+			res.send(found);
 		});		
 	});
 }
