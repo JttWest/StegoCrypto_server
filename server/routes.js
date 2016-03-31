@@ -37,9 +37,9 @@ module.exports = function(app) {
    		var password = req.body.password;
     	var instanceIDTokens = req.body.instanceIDTokens;
 
-		user_calls.register(userName, password, instanceIDTokens, function (found) {
-			console.log(found);
-			res.json(found);
+		user_calls.register(userName, password, instanceIDTokens, function (result) {
+			console.log(result);
+			res.json(result);
 		});		
 	});
 
@@ -48,20 +48,20 @@ module.exports = function(app) {
    		var password = req.body.password;
     	var instanceIDTokens = req.body.instanceIDTokens;
 
-		user_calls.login(userName, password, instanceIDTokens, function (found) {
-			console.log(found);
-			res.json(found);
+		user_calls.login(userName, password, instanceIDTokens, function (result) {
+			console.log(result);
+			res.json(result);
 		});		
 	});
 
 	app.post('/sendMessage',function(req,res){
 		var fromUserName = req.body.fromUserName;
         var toUserName = req.body.toUserName;
-        var msg = req.body.message;
+        var data = req.body.data;
 
-		user_calls.sendMessage(fromUserName, toUserName, msg, function (found) {
-			console.log(found);
-			res.send(found);
+		user_calls.sendMessage(fromUserName, toUserName, data, function (result) {
+			console.log(result);
+			res.send(result);
 		});		
 	});
 }

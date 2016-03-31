@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var gcm = require('node-gcm');
 var user = require('./models/user');
 var request = require('request');
+var data_transfer = require('./data_transfer');
 
 var GCMsender = new gcm.Sender( process.env.GCM_SERVER_API_KEY || require('../config/configs').GCM_server_API_key );
 var GCM_SERVER_API_KEY = process.env.GCM_SERVER_API_KEY || require('../config/configs').GCM_server_API_key;
@@ -35,11 +36,13 @@ exports.login = function(userName, password, instanceIDTokens, callback) {
     } else {
       if(password == user.password) {
         // update DB with new instanceIDToken
-        user.instanceIDTokens.push(instanceIDTokens);
-        user.save(function (err){
-            if (err)
-              callback(err);
-        });
+        if (instanceIDTokens) {
+          user.instanceIDTokens.push(instanceIDTokens);
+          user.save(function (err){
+              if (err)
+                callback(err);
+          });
+        }
         callback({'response':"Sucessfully login."});
       } else {
         callback({'response':"Wrong password."});
@@ -73,6 +76,42 @@ exports.removeUser = function(userName,callback) {
   });
 }
 
+
+
+exports.sendMessage = function(fromUserName, toUserName, data, callback) {
+  // create the data package
+  var dataPackageAttributes = data_transfer.createPackageInDB(fromUserName, toUserName, data);
+
+  user.findOne({userName: toUserName},function(err,user){
+    if (!user){
+      callback("Recipient user doesn't exist.");
+    } else {
+      // get the devices to send data to using instanceIDTokens
+      var destinationDevices = user.instanceIDTokens;
+
+      // intented recipient is not currently logged in to any device
+      if (!destinationDevices)
+        callback("Recipient is offline."); // recipient will request for pending packages when logged in
+      else {
+        var message = new gcm.Message();
+        message.addData('data_package', dataPackageAttributes);
+
+        var to_id = ['cipQuQ32y9U:APA91bHBNTrN4dMYmSazJq4LidJfeRHbtf9uq1J6biaouBksVPsLXhHAFbzdYfXIRGRSjiBmm40hG28MRXaFjl6golu8veMJKQ-Kpi-FVoMW0oqsGfTinWcnq3yalz88rmjbYK0H60Dn'];
+
+        // send to user
+        GCMsender.send(message, { registrationTokens: to_id }, 3, function (err, response){
+          if (err) 
+            callback(err);
+          else    
+            callback(response);
+        });  
+      }
+    }
+  });
+}
+
+
+/*
 exports.sendMessage = function(fromUserName, toUserName, msg, callback) {
   user.find({userName: toUserName},function(err,users){
     var len = users.length;
@@ -88,10 +127,7 @@ exports.sendMessage = function(fromUserName, toUserName, msg, callback) {
       message.addData('body', "test body");
       message.addData('icon', "random");
 
-      /*
-      console.log(message);
-      */
-      /*
+      
       var to_id = 'cipQuQ32y9U:APA91bHBNTrN4dMYmSazJq4LidJfeRHbtf9uq1J6biaouBksVPsLXhHAFbzdYfXIRGRSjiBmm40hG28MRXaFjl6golu8veMJKQ-Kpi-FVoMW0oqsGfTinWcnq3yalz88rmjbYK0H60Dn';
       request(
         { method: 'POST',
@@ -116,15 +152,15 @@ exports.sendMessage = function(fromUserName, toUserName, msg, callback) {
             else
               callback({'response': response});
           }
-      );*/
-      /*
+      );
+      
       GCMsender.send(message, { registrationTokens: regTokens }, 3, function (err, response){
         if (err) 
           console.error(err);
         else    
           console.log(response);
       });
-      */
+      
       
       // Send to a topic, with no retry this time
       GCMsender.sendNoRetry(message, { topic: '/topics/global' }, function (err, response) {
@@ -134,6 +170,31 @@ exports.sendMessage = function(fromUserName, toUserName, msg, callback) {
       
     }
   });
+}*/
+
+
+exports.removeInstanceIDTokenFromUser = function(userName, instanceIDToken, callback){
+  user.findOne({userName: userName},function(err,user){
+    if (!user) {
+      callback("Can't find user to remove instanceIDToken");
+    } else {
+      user.instanceIDTokens = removeInstanceIDTokenFromArr(user.instanceIDTokens, instanceIDToken);
+      user.save(function (err){
+        if (err)
+          callback(err);
+      });
+      callback("instanceIDToken successfully removed");
+    }
+  });
+}
+
+function removeInstanceIDTokenFromArr(instanceIDTokensArray, instanceIDToken) {
+  for(var i=0; i<instanceIDTokensArray.length; i++) {
+    if(instanceIDTokensArray[i] === instanceIDToken) {
+      instanceIDTokensArray.splice(i, 1);
+      return instanceIDTokensArray;
+    }
+  }
 }
 
 function removeUserFromArr(arr, userName) {
@@ -141,7 +202,6 @@ function removeUserFromArr(arr, userName) {
     if(arr[i].userName === userName) {
       arr.splice(i, 1);
       return arr;
-      break;
     }
   }
 }
