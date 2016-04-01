@@ -9,7 +9,7 @@ var GCMsender = new gcm.Sender( process.env.GCM_SERVER_API_KEY || require('../co
 var GCM_SERVER_API_KEY = process.env.GCM_SERVER_API_KEY || require('../config/configs').GCM_server_API_key;
 
 
-exports.register = function(userName, password, instanceIDTokens, callback) {
+exports.register = function(userName, password, callback) {
   var newuser = new user({ 
     userName               : userName,
     password               : password, 
@@ -93,10 +93,10 @@ exports.sendMessage = function(fromUserName, toUserName, data, callback) {
         message.addData('data_package', dataPackageAttributes);
 
         // testing
-        var to_id = ['cipQuQ32y9U:APA91bHBNTrN4dMYmSazJq4LidJfeRHbtf9uq1J6biaouBksVPsLXhHAFbzdYfXIRGRSjiBmm40hG28MRXaFjl6golu8veMJKQ-Kpi-FVoMW0oqsGfTinWcnq3yalz88rmjbYK0H60Dn'];
+        //var to_id = ['cipQuQ32y9U:APA91bHBNTrN4dMYmSazJq4LidJfeRHbtf9uq1J6biaouBksVPsLXhHAFbzdYfXIRGRSjiBmm40hG28MRXaFjl6golu8veMJKQ-Kpi-FVoMW0oqsGfTinWcnq3yalz88rmjbYK0H60Dn'];
 
         // send to user
-        GCMsender.send(message, { registrationTokens: to_id }, 3, function (err, response){
+        GCMsender.send(message, { registrationTokens: destinationDevices }, 3, function (err, response){
           if (err) 
             callback(err);
           else    

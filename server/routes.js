@@ -37,7 +37,7 @@ module.exports = function(app) {
    		var password = req.body.password;
     	//var instanceIDTokens = req.body.instanceIDToken;
 
-		user_calls.register(userName, password, instanceIDTokens, function (result) {
+		user_calls.register(userName, password, function (result) {
 			console.log(result);
 			res.json(result);
 		});		
