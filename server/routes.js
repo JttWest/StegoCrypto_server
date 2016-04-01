@@ -64,4 +64,23 @@ module.exports = function(app) {
 			res.send(result);
 		});		
 	});
+
+	app.get('/getPendingPackages',function(req,res){
+		var username = req.param['username'];
+
+		// function that takes username and sends every package intented for
+		// the user
+		user_calls.sendPendingPackages(username, function (result) {
+			console.log(result);
+			res.send(result);
+		});		
+
+		/*
+		user_calls.sendMessage(fromUserName, toUserName, data, function (result) {
+			console.log(result);
+			res.send(result);
+		});		*/
+	});
+
+	//app.post('/acknowledgePackage')
 }

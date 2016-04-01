@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var gcm = require('node-gcm');
 var user = require('./models/user');
+var data_package = require('./models/data_package');
 var request = require('request');
 var data_transfer = require('./data_transfer');
 
@@ -28,16 +29,16 @@ exports.register = function(userName, password, instanceIDTokens, callback) {
    }});
 }
 
-exports.login = function(userName, password, instanceIDTokens, callback) {
+exports.login = function(userName, password, instanceIDToken, callback) {
 
   user.findOne({userName: userName}, function(err,user){
     if (!user) {
       callback({'response':"User does not exist."});
     } else {
       if(password == user.password) {
-        // update DB with new instanceIDToken
-        if (instanceIDTokens) {
-          user.instanceIDTokens.push(instanceIDTokens);
+        // update DB with new instanceIDToken if its not already in there
+        if (instanceIDToken && user.instanceIDTokens.indexOf(instanceIDToken) < 0) {
+          user.instanceIDTokens.push(instanceIDToken);
           user.save(function (err){
               if (err)
                 callback(err);
@@ -52,7 +53,6 @@ exports.login = function(userName, password, instanceIDTokens, callback) {
 
 // not complete
 exports.getContactsOnline = function(userName,callback) {
-
   user.find(function(err,users){
 
     var len = users.length;
@@ -64,9 +64,7 @@ exports.getContactsOnline = function(userName,callback) {
   }});
 }
 
-
 exports.removeUser = function(userName,callback) {
-
   user.remove({userName:userName},function(err,users){
     if(!err){
       callback({'response':"Removed Sucessfully"});
@@ -76,14 +74,12 @@ exports.removeUser = function(userName,callback) {
   });
 }
 
-
-
 exports.sendMessage = function(fromUserName, toUserName, data, callback) {
   // create the data package
   var dataPackageAttributes = data_transfer.createPackageInDB(fromUserName, toUserName, data);
 
   user.findOne({userName: toUserName},function(err,user){
-    if (!user){
+    if (!user) {
       callback("Recipient user doesn't exist.");
     } else {
       // get the devices to send data to using instanceIDTokens
@@ -96,6 +92,7 @@ exports.sendMessage = function(fromUserName, toUserName, data, callback) {
         var message = new gcm.Message();
         message.addData('data_package', dataPackageAttributes);
 
+        // testing
         var to_id = ['cipQuQ32y9U:APA91bHBNTrN4dMYmSazJq4LidJfeRHbtf9uq1J6biaouBksVPsLXhHAFbzdYfXIRGRSjiBmm40hG28MRXaFjl6golu8veMJKQ-Kpi-FVoMW0oqsGfTinWcnq3yalz88rmjbYK0H60Dn'];
 
         // send to user
@@ -108,6 +105,22 @@ exports.sendMessage = function(fromUserName, toUserName, data, callback) {
       }
     }
   });
+}
+
+
+// in progress
+exports.sendPendingPackages = function(userName, callback){
+   data_package.find({to_userName: userName, delivered: false}, function(err, data_packages){
+        if (!data_packages) {
+          callback("No pending package for user");
+        }
+        else {
+          for (var package in data_packages){
+            //sendMessage
+          }
+        }
+      }
+    );
 }
 
 
@@ -173,6 +186,8 @@ exports.sendMessage = function(fromUserName, toUserName, msg, callback) {
 }*/
 
 
+// Called when a user logs out from a device: removes the instanceIDToken associated 
+// with that device so data won't get send there
 exports.removeInstanceIDTokenFromUser = function(userName, instanceIDToken, callback){
   user.findOne({userName: userName},function(err,user){
     if (!user) {
@@ -188,20 +203,23 @@ exports.removeInstanceIDTokenFromUser = function(userName, instanceIDToken, call
   });
 }
 
+// Helper function to remove a instanceIDToken from instanceIDTokensArray
 function removeInstanceIDTokenFromArr(instanceIDTokensArray, instanceIDToken) {
   for(var i=0; i<instanceIDTokensArray.length; i++) {
     if(instanceIDTokensArray[i] === instanceIDToken) {
       instanceIDTokensArray.splice(i, 1);
-      return instanceIDTokensArray;
+      break;
     }
   }
+  return instanceIDTokensArray;
 }
 
 function removeUserFromArr(arr, userName) {
   for(var i=0; i<arr.length; i++) {
     if(arr[i].userName === userName) {
       arr.splice(i, 1);
-      return arr;
+      break;
     }
   }
+  return arr;
 }
