@@ -35,7 +35,7 @@ module.exports = function(app) {
 	app.post('/register',function(req,res){
 		var userName = req.body.userName;
    		var password = req.body.password;
-    	var instanceIDTokens = req.body.instanceIDTokens;
+    	//var instanceIDTokens = req.body.instanceIDToken;
 
 		user_calls.register(userName, password, instanceIDTokens, function (result) {
 			console.log(result);
@@ -46,7 +46,7 @@ module.exports = function(app) {
 	app.post('/login',function(req,res){
 		var userName = req.body.userName;
    		var password = req.body.password;
-    	var instanceIDTokens = req.body.instanceIDTokens;
+    	var instanceIDTokens = req.body.instanceIDToken;
 
 		user_calls.login(userName, password, instanceIDTokens, function (result) {
 			console.log(result);
