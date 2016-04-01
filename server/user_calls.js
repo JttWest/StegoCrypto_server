@@ -74,7 +74,7 @@ exports.removeUser = function(userName,callback) {
   });
 }
 
-exports.sendMessage = function(fromUserName, toUserName, data, callback) {
+exports.sendData = function(fromUserName, toUserName, data, callback) {
   // create the data package
   var dataPackageAttributes = data_transfer.createPackageInDB(fromUserName, toUserName, data);
 
@@ -84,7 +84,9 @@ exports.sendMessage = function(fromUserName, toUserName, data, callback) {
     } else {
       // get the devices to send data to using instanceIDTokens
       var destinationDevices = user.instanceIDTokens;
-
+      console.log("Sending data to: ");
+      console.log(destinationDevices);
+      
       // intented recipient is not currently logged in to any device
       if (!destinationDevices)
         callback("Recipient is offline."); // recipient will request for pending packages when logged in
@@ -93,7 +95,8 @@ exports.sendMessage = function(fromUserName, toUserName, data, callback) {
         message.addData('data_package', dataPackageAttributes);
 
         // testing
-        //var to_id = ['cipQuQ32y9U:APA91bHBNTrN4dMYmSazJq4LidJfeRHbtf9uq1J6biaouBksVPsLXhHAFbzdYfXIRGRSjiBmm40hG28MRXaFjl6golu8veMJKQ-Kpi-FVoMW0oqsGfTinWcnq3yalz88rmjbYK0H60Dn'];
+        var to_id = ['cipQuQ32y9U:APA91bHBNTrN4dMYmSazJq4LidJfeRHbtf9uq1J6biaouBksVPsLXhHAFbzdYfXIRGRSjiBmm40hG28MRXaFjl6golu8veMJKQ-Kpi-FVoMW0oqsGfTinWcnq3yalz88rmjbYK0H60Dn'];
+
 
         // send to user
         GCMsender.send(message, { registrationTokens: destinationDevices }, 3, function (err, response){

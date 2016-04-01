@@ -25,16 +25,17 @@ module.exports = function(app) {
 		res.send(result);
 	});
 
+	/*
 	app.post('/sendData', function (req, res) {
 		var data = decodeURIComponent(req.body.data);
 	    var user_name = message_queue.push(data);
 	    res.send("Server received: " + data);
-	});
+	});*/
 
 	// user calls
 	app.post('/register',function(req,res){
-		var userName = req.body.userName;
-   		var password = req.body.password;
+		var userName = decodeURIComponent(req.body.userName);
+   		var password = decodeURIComponent(req.body.password);
     	//var instanceIDTokens = req.body.instanceIDToken;
 
 		user_calls.register(userName, password, function (result) {
@@ -44,9 +45,9 @@ module.exports = function(app) {
 	});
 
 	app.post('/login',function(req,res){
-		var userName = req.body.userName;
-   		var password = req.body.password;
-    	var instanceIDTokens = req.body.instanceIDToken;
+		var userName = decodeURIComponent(req.body.userName);
+   		var password = decodeURIComponent(req.body.password);
+    	var instanceIDTokens = decodeURIComponent(req.body.instanceIDToken);
 
 		user_calls.login(userName, password, instanceIDTokens, function (result) {
 			console.log(result);
@@ -54,12 +55,12 @@ module.exports = function(app) {
 		});		
 	});
 
-	app.post('/sendMessage',function(req,res){
-		var fromUserName = req.body.fromUserName;
-        var toUserName = req.body.toUserName;
-        var data = req.body.data;
+	app.post('/sendData',function(req,res){
+		var fromUserName = decodeURIComponent(req.body.fromUserName);
+        var toUserName = decodeURIComponent(req.body.toUserName);
+        var data = decodeURIComponent(req.body.data);
 
-		user_calls.sendMessage(fromUserName, toUserName, data, function (result) {
+		user_calls.sendData(fromUserName, toUserName, data, function (result) {
 			console.log(result);
 			res.send(result);
 		});		
