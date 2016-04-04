@@ -137,7 +137,7 @@ exports.sendPendingPackages = function(userName, callback){
           }
         }
       }
-    );
+  );
 }
 
 
@@ -201,6 +201,7 @@ exports.sendMessage = function(fromUserName, toUserName, msg, callback) {
     }
   });
 }*/
+
 
 
 // Called when a user logs out from a device: removes the instanceIDToken associated 

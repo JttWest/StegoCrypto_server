@@ -36,6 +36,17 @@ exports.getPendingPackagesForUser = function(userName, callback){
 }
 */
 
+exports.retrieveDataFromPackage = function(package_id, callback){
+  console.log(package_id);
+  data_package.findOne({package_id: package_id}, function(err, data_package){
+    if (!data_package) {
+      callback({'response' : "Package ID doesn't exist."});
+    } else {
+      callback({'data' : data_package['data']});
+    }
+  });
+}
+
 // Sets the delivered flag to 'status' for the package with matching package_id
 exports.setDeliveredFlagForPackage = function(package_id, status, callback){
     data_package.findOne({package_id: package_id}, function(err, data_package){

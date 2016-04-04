@@ -1,4 +1,5 @@
 var user_calls = require('./user_calls');
+var data_transfer = require('./data_transfer');
 
 module.exports = function(app) {
 	var message_queue = []
@@ -63,6 +64,17 @@ module.exports = function(app) {
 		user_calls.sendData(fromUserName, toUserName, data, function (result) {
 			console.log(result);
 			res.send(result);
+		});		
+	});
+
+	// A seperate API call to retrieve data from package since size of data can be
+	// bigger than max allow for GCM (4KB)
+	app.get('/retrieveDataFromPackage',function(req,res){
+		var packageID = decodeURIComponent(req.query.packageID); //decodeURIComponent(req.body.packageID);
+
+		data_transfer.retrieveDataFromPackage(packageID, function (result) {
+			console.log(result);
+			res.json(result);
 		});		
 	});
 
