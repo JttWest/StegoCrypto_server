@@ -80,31 +80,45 @@ exports.sendData = function(fromUserName, toUserName, data, callback) {
 
   user.findOne({userName: toUserName},function(err,user){
     if (!user) {
-      callback("Recipient user doesn't exist.");
+      callback({'response' : "Recipient user doesn't exist."});
     } else {
       // get the devices to send data to using instanceIDTokens
       var destinationDevices = user.instanceIDTokens;
       console.log("Sending data to: ");
       console.log(destinationDevices);
       
-      // intented recipient is not currently logged in to any device
-      if (!destinationDevices)
-        callback("Recipient is offline."); // recipient will request for pending packages when logged in
-      else {
+      // intented recipient is currently logged in to atleast 1 device
+      if(destinationDevices) {
         var message = new gcm.Message();
-        message.addData('data_package', dataPackageAttributes);
+
+        var data = { 'fromUserName' : dataPackageAttributes['from_userName'],
+                     'toUserName'   : dataPackageAttributes['to_userName'],
+                     'date'         : dataPackageAttributes['date_created'],
+                     'package_id'   : dataPackageAttributes['package_id']
+                    }
+
+        message.addData('data_package', data);
+
+
+        /*
+        message.addData('fromUserName', dataPackageAttributes['from_userName']);
+        message.addData('toUserName', dataPackageAttributes['to_userName']);
+        message.addData('date', dataPackageAttributes['date_created']);
+        message.addData('package_id', dataPackageAttributes['package_id']);
+        */
 
         // testing
-        var to_id = ['cipQuQ32y9U:APA91bHBNTrN4dMYmSazJq4LidJfeRHbtf9uq1J6biaouBksVPsLXhHAFbzdYfXIRGRSjiBmm40hG28MRXaFjl6golu8veMJKQ-Kpi-FVoMW0oqsGfTinWcnq3yalz88rmjbYK0H60Dn'];
-
+        //var to_id = ['cipQuQ32y9U:APA91bHBNTrN4dMYmSazJq4LidJfeRHbtf9uq1J6biaouBksVPsLXhHAFbzdYfXIRGRSjiBmm40hG28MRXaFjl6golu8veMJKQ-Kpi-FVoMW0oqsGfTinWcnq3yalz88rmjbYK0H60Dn'];
 
         // send to user
         GCMsender.send(message, { registrationTokens: destinationDevices }, 3, function (err, response){
           if (err) 
-            callback(err);
+            console.log(err);
           else    
-            callback(response);
+            console.log(response);
         });  
+
+        callback({'response' : "Data sent sucessfully."});
       }
     }
   });

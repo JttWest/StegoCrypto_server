@@ -7,10 +7,10 @@ exports.createPackageInDB = function(from_userName, to_userName, data){
     var dataPackageAttributes = { 
         from_userName          : from_userName,
         to_userName            : to_userName, 
-        data                   : data,
         date_created           : new Date(),
         delivered              : false,
-        package_id             : uuid.v4()
+        package_id             : uuid.v4(),
+        data                   : data
     }
 
     var newDataPackage = new data_package(dataPackageAttributes);
