@@ -5,7 +5,7 @@ var dataPackageSchema = mongoose.Schema({
     from_userName       : String,
     to_userName         : String,
     data                : String,
-    date_created        : Date,
+    date_created        : String,
     delivered           : Boolean,
     package_id          : String
 });

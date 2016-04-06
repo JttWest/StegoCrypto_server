@@ -3,11 +3,14 @@ var data_package = require('./models/data_package');
 var uuid = require('node-uuid');
 
 
+
+
+
 exports.createPackageInDB = function(from_userName, to_userName, data){
     var dataPackageAttributes = { 
         from_userName          : from_userName,
         to_userName            : to_userName, 
-        date_created           : new Date(),
+        date_created           : Date(),
         delivered              : false,
         package_id             : uuid.v4(),
         data                   : data
@@ -60,6 +63,33 @@ exports.setDeliveredFlagForPackage = function(package_id, status, callback){
           });
         }
         callback("setDeliveredFlagForPackage: success");
+    });
+}
+
+var dataTransferHistoryItem = function(fromUserName, toUserName, packageID, date){
+    this.fromUserName = fromUserName;
+    this.toUserName = toUserName;
+    this.packageID = packageID;
+    this.date = date;
+}
+
+// Retrieves the data transfer history of a user
+exports.getDataTransferHistory = function(userName, callback){
+    console.log(userName);
+
+    data_package.find({ $or: [{from_userName: userName}, {to_userName: userName}] }, function(err, dataPackages) {
+        var result = [];
+
+        dataPackages.forEach(function (elem, index, array) {
+            var item = new dataTransferHistoryItem( elem.from_userName,
+                                                    elem.to_userName,
+                                                    elem.package_id,
+                                                    elem.date_created);
+                                                    
+
+            result.push(item)
+        });         
+        callback(result);
     });
 }
 

@@ -95,5 +95,24 @@ module.exports = function(app) {
 		});		*/
 	});
 
+
+	app.get('/getDataTransferHistory',function(req,res){
+		var username = decodeURIComponent(req.query.username);
+
+		// function that takes username and sends every package intented for
+		// the user
+		data_transfer.getDataTransferHistory(username, function (result) {
+			console.log(result);
+			res.json(result);
+		});		
+
+		/*
+		user_calls.sendMessage(fromUserName, toUserName, data, function (result) {
+			console.log(result);
+			res.send(result);
+		});		*/
+	});
+
+
 	//app.post('/acknowledgePackage')
 }
