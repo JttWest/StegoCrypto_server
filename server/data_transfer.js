@@ -2,10 +2,7 @@ var mongoose = require('mongoose');
 var data_package = require('./models/data_package');
 var uuid = require('node-uuid');
 
-
-
-
-
+// Compile data from sendData route into data package and store it in DB
 exports.createPackageInDB = function(from_userName, to_userName, data){
     var dataPackageAttributes = { 
         from_userName          : from_userName,
@@ -27,18 +24,7 @@ exports.createPackageInDB = function(from_userName, to_userName, data){
 }
 
 
-
-/*
-// Perform callback any packages where userName match to_userName in data_package collection
-exports.getPendingPackagesForUser = function(userName, callback){
-    data_package.find({to_userName: userName}, function(err, data_packages){
-        if(data_packages) 
-            callback(data_packages);
-        }
-    });
-}
-*/
-
+// Retrieves the image from a data package
 exports.retrieveDataFromPackage = function(package_id, callback){
   console.log(package_id);
   data_package.findOne({package_id: package_id}, function(err, data_package){
@@ -66,6 +52,7 @@ exports.setDeliveredFlagForPackage = function(package_id, status, callback){
     });
 }
 
+// Contructer function for data transfer item
 var dataTransferHistoryItem = function(fromUserName, toUserName, packageID, date){
     this.fromUserName = fromUserName;
     this.toUserName = toUserName;

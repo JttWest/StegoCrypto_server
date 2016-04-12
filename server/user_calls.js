@@ -9,12 +9,11 @@ var GCMsender = new gcm.Sender( process.env.GCM_SERVER_API_KEY || require('../co
 var GCM_SERVER_API_KEY = process.env.GCM_SERVER_API_KEY || require('../config/configs').GCM_server_API_key;
 
 
+// save new user info into DB if it doesn't already exit
 exports.register = function(userName, password, callback) {
   var newuser = new user({ 
     userName               : userName,
     password               : password, 
-    //instanceIDTokens       : [instanceIDTokens] -- instanceID only updated by login
-    //userID     : userID  should auto generate this...
   });
 
   user.find({userName: userName}, function(err,users){
@@ -29,8 +28,8 @@ exports.register = function(userName, password, callback) {
    }});
 }
 
+// login user by checking DB and update instanceIDToken for Google Cloud Messeaging Service
 exports.login = function(userName, password, instanceIDToken, callback) {
-
   user.findOne({userName: userName}, function(err,user){
     if (!user) {
       callback({'response':"User does not exist."});
@@ -51,19 +50,7 @@ exports.login = function(userName, password, instanceIDToken, callback) {
    }});
 }
 
-// not complete
-exports.getContactsOnline = function(userName,callback) {
-  user.find(function(err,users){
-
-    var len = users.length;
-
-    if(len == 0){
-      callback({'response':"No contacts online"});
-    } else {
-      callback(removeUserFromArr(users, userName));
-  }});
-}
-
+// removes a user from DB
 exports.removeUser = function(userName,callback) {
   user.remove({userName:userName},function(err,users){
     if(!err){
@@ -74,6 +61,7 @@ exports.removeUser = function(userName,callback) {
   });
 }
 
+// send image from a user to another
 exports.sendData = function(fromUserName, toUserName, data, callback) {
   // create the data package
   var dataPackageAttributes = data_transfer.createPackageInDB(fromUserName, toUserName, data);
@@ -99,18 +87,6 @@ exports.sendData = function(fromUserName, toUserName, data, callback) {
 
         message.addData('data_package', data);
 
-
-        /*
-        message.addData('fromUserName', dataPackageAttributes['from_userName']);
-        message.addData('toUserName', dataPackageAttributes['to_userName']);
-        message.addData('date', dataPackageAttributes['date_created']);
-        message.addData('package_id', dataPackageAttributes['package_id']);
-        */
-
-        // testing
-        //var to_id = ['cipQuQ32y9U:APA91bHBNTrN4dMYmSazJq4LidJfeRHbtf9uq1J6biaouBksVPsLXhHAFbzdYfXIRGRSjiBmm40hG28MRXaFjl6golu8veMJKQ-Kpi-FVoMW0oqsGfTinWcnq3yalz88rmjbYK0H60Dn'];
-
-        // send to user
         GCMsender.send(message, { registrationTokens: destinationDevices }, 3, function (err, response){
           if (err) 
             console.log(err);
@@ -123,86 +99,6 @@ exports.sendData = function(fromUserName, toUserName, data, callback) {
     }
   });
 }
-
-
-// in progress
-exports.sendPendingPackages = function(userName, callback){
-   data_package.find({to_userName: userName, delivered: false}, function(err, data_packages){
-        if (!data_packages) {
-          callback("No pending package for user");
-        }
-        else {
-          for (var package in data_packages){
-            //sendMessage
-          }
-        }
-      }
-  );
-}
-
-
-/*
-exports.sendMessage = function(fromUserName, toUserName, msg, callback) {
-  user.find({userName: toUserName},function(err,users){
-    var len = users.length;
-    if(len == 0){
-      callback({'response':"Failure"});
-    } else {
-      //var to_token = users[0].instanceIDTokens;
-      //var to_userName = users[0].userName;
-
-      
-      var message = new gcm.Message();
-      message.addData('title', "test title");
-      message.addData('body', "test body");
-      message.addData('icon', "random");
-
-      
-      var to_id = 'cipQuQ32y9U:APA91bHBNTrN4dMYmSazJq4LidJfeRHbtf9uq1J6biaouBksVPsLXhHAFbzdYfXIRGRSjiBmm40hG28MRXaFjl6golu8veMJKQ-Kpi-FVoMW0oqsGfTinWcnq3yalz88rmjbYK0H60Dn';
-      request(
-        { method: 'POST',
-          uri: 'https://android.googleapis.com/gcm/send',
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization':'key=' + GCM_SERVER_API_KEY
-          },
-          body: JSON.stringify({
-            "to" : to_id,
-            "data" : {
-              "msg":'test msg',
-              "fromu":'test from u',
-              "name":'test name'
-            },
-            "time_to_live": 108
-          })
-        }
-        , function (error, response, body) {
-            if (error)
-              callback({'error:':error});
-            else
-              callback({'response': response});
-          }
-      );
-      
-      GCMsender.send(message, { registrationTokens: regTokens }, 3, function (err, response){
-        if (err) 
-          console.error(err);
-        else    
-          console.log(response);
-      });
-      
-      
-      // Send to a topic, with no retry this time
-      GCMsender.sendNoRetry(message, { topic: '/topics/global' }, function (err, response) {
-          if(err) console.error("Couldn't send message to GCM server: " + err);
-          else    console.log("Response from GCM server: " + response);
-      });
-      
-    }
-  });
-}*/
-
-
 
 // Called when a user logs out from a device: removes the instanceIDToken associated 
 // with that device so data won't get send there

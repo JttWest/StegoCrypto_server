@@ -26,18 +26,10 @@ module.exports = function(app) {
 		res.send(result);
 	});
 
-	/*
-	app.post('/sendData', function (req, res) {
-		var data = decodeURIComponent(req.body.data);
-	    var user_name = message_queue.push(data);
-	    res.send("Server received: " + data);
-	});*/
-
-	// user calls
+	// register new user
 	app.post('/register',function(req,res){
 		var userName = decodeURIComponent(req.body.userName);
    		var password = decodeURIComponent(req.body.password);
-    	//var instanceIDTokens = req.body.instanceIDToken;
 
 		user_calls.register(userName, password, function (result) {
 			console.log(result);
@@ -45,6 +37,7 @@ module.exports = function(app) {
 		});		
 	});
 
+	// login user
 	app.post('/login',function(req,res){
 		var userName = decodeURIComponent(req.body.userName);
    		var password = decodeURIComponent(req.body.password);
@@ -56,6 +49,7 @@ module.exports = function(app) {
 		});		
 	});
 
+	// send image to another user
 	app.post('/sendData',function(req,res){
 		var fromUserName = decodeURIComponent(req.body.fromUserName);
         var toUserName = decodeURIComponent(req.body.toUserName);
@@ -67,7 +61,7 @@ module.exports = function(app) {
 		});		
 	});
 
-	// A seperate API call to retrieve data from package since size of data can be
+	// a seperate API call to retrieve data from package since size of data can be
 	// bigger than max allow for GCM (4KB)
 	app.get('/retrieveDataFromPackage',function(req,res){
 		var packageID = decodeURIComponent(req.query.packageID); //decodeURIComponent(req.body.packageID);
@@ -78,6 +72,7 @@ module.exports = function(app) {
 		});		
 	});
 
+	// images for a user who hasn't been sent due to lack of network connection
 	app.get('/getPendingPackages',function(req,res){
 		var username = req.param['username'];
 
@@ -87,15 +82,10 @@ module.exports = function(app) {
 			console.log(result);
 			res.send(result);
 		});		
-
-		/*
-		user_calls.sendMessage(fromUserName, toUserName, data, function (result) {
-			console.log(result);
-			res.send(result);
-		});		*/
 	});
 
 
+	// retrieve the image transfer history of a user
 	app.get('/getDataTransferHistory',function(req,res){
 		var username = decodeURIComponent(req.query.username);
 
@@ -106,13 +96,5 @@ module.exports = function(app) {
 			res.json(result);
 		});		
 
-		/*
-		user_calls.sendMessage(fromUserName, toUserName, data, function (result) {
-			console.log(result);
-			res.send(result);
-		});		*/
 	});
-
-
-	//app.post('/acknowledgePackage')
 }
